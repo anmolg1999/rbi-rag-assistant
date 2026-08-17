@@ -1,0 +1,102 @@
+{
+  "151MD.pdf": {
+    "hash": "98673deb6667ae9d2b9acb67b1de2900d253b1f498b7b0dc5bfb8dc6c665896c",
+    "chunks": 1148,
+    "size_bytes": 2608058
+  },
+  "154MD.pdf": {
+    "hash": "7e35cbf3b35f7e267906ed72c0153ca46c9d88d8faded24a0f1efe21f83e83c8",
+    "chunks": 394,
+    "size_bytes": 1090899
+  },
+  "155MD.pdf": {
+    "hash": "979bc463a44778652b64ba809f5c407b3c5e7a14280e8bae2e6ea0c836e9ab4a",
+    "chunks": 91,
+    "size_bytes": 443607
+  },
+  "156MD.pdf": {
+    "hash": "f5c05a8b70f3760ca7c6b39b3baa2fc55e3102a3f3d55186e8a61e89011455aa",
+    "chunks": 163,
+    "size_bytes": 875058
+  },
+  "157MD.pdf": {
+    "hash": "8775fb9c9e3b82111fa6739bc70329f29b4a48d70eb97d30d6128c7ee3d9ed78",
+    "chunks": 116,
+    "size_bytes": 534747
+  },
+  "158MD.pdf": {
+    "hash": "ffd58a5716ef6c5657f34ba370ef3067b5900de8eeb59e6e7694f331ad05a96a",
+    "chunks": 156,
+    "size_bytes": 769935
+  },
+  "159MD.pdf": {
+    "hash": "6047016c0c863470ea3acb2fe2f82667bc958f5397b937345a87db587952e474",
+    "chunks": 139,
+    "size_bytes": 519514
+  },
+  "160MD.pdf": {
+    "hash": "47a1eb77ca020da73f04e83f4d8f49db422fd6fdec6c769cc5a875e19b178a92",
+    "chunks": 132,
+    "size_bytes": 472319
+  },
+  "161MD.pdf": {
+    "hash": "3e9a0ff82ed85195d517cb91867dc3db26d88430843e2cef3e377d4790b36cc4",
+    "chunks": 46,
+    "size_bytes": 326584
+  },
+  "164MD.pdf": {
+    "hash": "a46bcc439c129eefd393092f48f000c50c07febe7fb4806ec53624186dc23d53",
+    "chunks": 132,
+    "size_bytes": 627447
+  },
+  "165MD.pdf": {
+    "hash": "d17fc1fe81a762bb4d1fbf265b0d3f278bf42bea393f601215ffbf388c19a96b",
+    "chunks": 149,
+    "size_bytes": 519010
+  },
+  "166MD.pdf": {
+    "hash": "3cd6ae58500dc8dc470b214e47a7ec87c1f423c7a3607d56c38bd0023f3dd97b",
+    "chunks": 75,
+    "size_bytes": 482011
+  },
+  "397MD7DCC951F9F014A738C60E0FBC1A73D70.pdf": {
+    "hash": "475c7a073b94571a87d16b0e7f1522fdca1897ea998295d436a3070bad2eab20",
+    "chunks": 232,
+    "size_bytes": 892264
+  },
+  "MD_CRR_SLR.pdf": {
+    "hash": "3fb09f733e5236d73654b0ea63ef281cf42b89fbe22b5c715a14a87a56eda80b",
+    "chunks": 91,
+    "size_bytes": 592767
+  },
+  "MD_DigitalPayments.pdf": {
+    "hash": "9ed7827af0b3925b54448c4e3717fd7d5422389b181c1f974ae1c037c23c6c53",
+    "chunks": 81,
+    "size_bytes": 413422
+  },
+  "MD_HousingFinance.pdf": {
+    "hash": "bd48be1fede71b1589a63922c3b39d8972a58006a08051342676a744dda8da74",
+    "chunks": 280,
+    "size_bytes": 833695
+  },
+  "MD_InterestRates.pdf": {
+    "hash": "3e9a0ff82ed85195d517cb91867dc3db26d88430843e2cef3e377d4790b36cc4",
+    "chunks": 46,
+    "size_bytes": 326584
+  },
+  "MD_KYC.pdf": {
+    "hash": "3d1ea749363fd1dee12140292b67e6a78d53089a0976d9fe7de1926da4a5adf6",
+    "chunks": 278,
+    "size_bytes": 699883
+  },
+  "MD_MSME.pdf": {
+    "hash": "ccc5c07c7e80c8a0ea5657bfd57f2ea5bb9634189cd14db2732b2ea204999d25",
+    "chunks": 45,
+    "size_bytes": 439977
+  },
+  "MD_PSL.pdf": {
+    "hash": "7e1c94dfad28393daf9f32f2a3e9cec7592d3c2c86fd0bfefb5d26630bef4f82",
+    "chunks": 132,
+    "size_bytes": 835149
+  }
+}
