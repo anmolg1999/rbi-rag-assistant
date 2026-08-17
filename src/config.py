@@ -50,7 +50,7 @@ RETRIEVER_K = 4            # Number of chunks to retrieve
 # Web Search
 # ──────────────────────────────────────────────
 WEB_SEARCH_MAX_RESULTS = 5
-RELEVANCE_THRESHOLD = 0.45     # Minimum similarity score to skip web search
+RELEVANCE_THRESHOLD = 0.55     # Minimum similarity score to skip web search
 
 # ──────────────────────────────────────────────
 # PDF filename → human-readable document name mapping
