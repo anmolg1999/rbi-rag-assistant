@@ -7,5 +7,5 @@ faiss-cpu
 streamlit
 pypdf
 python-dotenv
-googlesearch-python
+duckduckgo-search
 requests

@@ -6,7 +6,7 @@ circulars, notifications, and regulatory updates.
 """
 
 from dataclasses import dataclass
-from googlesearch import search as google_search
+from ddgs import DDGS
 
 @dataclass
 class WebSearchResult:
@@ -20,8 +20,8 @@ class RBIWebSearcher:
     """
     Search engine restricted to the RBI website (rbi.org.in).
 
-    Uses googlesearch-python with
-    site: restriction to ensure only official RBI content is returned.
+    Uses DuckDuckGo Search (free, no API key required) with HTML backend
+    to bypass strict rate limits on Streamlit Cloud.
     """
 
     DOMAIN = "rbi.org.in"
@@ -42,17 +42,20 @@ class RBIWebSearcher:
         restricted_query = f"site:{self.DOMAIN} {query}"
 
         try:
-            raw_results = google_search(restricted_query, num_results=max_results, advanced=True)
-
             results = []
-            for r in raw_results:
-                results.append(
-                    WebSearchResult(
-                        title=getattr(r, "title", ""),
-                        url=getattr(r, "url", ""),
-                        snippet=getattr(r, "description", ""),
-                    )
+            with DDGS() as ddgs:
+                raw_results = list(
+                    ddgs.text(restricted_query, max_results=max_results, backend='html')
                 )
+
+                for r in raw_results:
+                    results.append(
+                        WebSearchResult(
+                            title=r.get("title", ""),
+                            url=r.get("href", r.get("link", "")),
+                            snippet=r.get("body", r.get("snippet", "")),
+                        )
+                    )
 
             return results
 
