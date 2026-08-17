@@ -78,6 +78,7 @@ DOCUMENT_NAMES = {
     "MD_HousingFinance.pdf": "Housing Finance Companies",
     "MD_InterestRates.pdf": "Interest Rates on Advances",
     "MD_DigitalPayments.pdf": "Digital Payment Security Controls",
+    "Master_Circular_Guarantees.pdf": "Master Circular - Guarantees and Co-acceptances",
 }
 
 

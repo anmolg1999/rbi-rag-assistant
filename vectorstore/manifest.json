@@ -98,5 +98,10 @@
     "hash": "7e1c94dfad28393daf9f32f2a3e9cec7592d3c2c86fd0bfefb5d26630bef4f82",
     "chunks": 132,
     "size_bytes": 835149
+  },
+  "Master_Circular_Guarantees.pdf": {
+    "hash": "2fdad2496a291561634ec442eef812e21bd65ca1d306054f48b388dfae9842ff",
+    "chunks": 262,
+    "size_bytes": 1416561
   }
 }
