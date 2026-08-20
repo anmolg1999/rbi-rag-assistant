@@ -47,10 +47,12 @@ LLM_TEMPERATURE = 0        # Deterministic answers for regulatory queries
 RETRIEVER_K = 4            # Number of chunks to retrieve
 
 # ──────────────────────────────────────────────
-# Web Search
+# Relevance threshold for RAG context quality
 # ──────────────────────────────────────────────
-WEB_SEARCH_MAX_RESULTS = 5
-RELEVANCE_THRESHOLD = 0.55     # Minimum similarity score to skip web search
+# FAISS L2 distance: lower = more similar
+# similarity = 1 / (1 + distance)
+# If best similarity < this, context is considered insufficient
+RELEVANCE_THRESHOLD = 0.55
 
 # ──────────────────────────────────────────────
 # PDF filename → human-readable document name mapping

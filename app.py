@@ -3,7 +3,7 @@ RBI Regulatory Circular Assistant — Streamlit Chat UI
 
 A RAG-powered chatbot that answers questions about RBI Master Directions
 related to credit regulations for commercial banks.
-Supports hybrid RAG + Web Search for comprehensive answers.
+Supports smart intent routing: RAG, live rates, general knowledge, and self-awareness.
 
 Usage:
     streamlit run app.py
@@ -88,6 +88,9 @@ st.markdown("""
     .source-card.web-source .doc-name {
         color: #48bb78;
     }
+    .source-card.rate-source .doc-name {
+        color: #ed8936;
+    }
 
     /* Source type badge */
     .source-badge {
@@ -103,15 +106,25 @@ st.markdown("""
         color: #667eea;
         border: 1px solid rgba(102, 126, 234, 0.3);
     }
-    .badge-web {
+    .badge-meta {
+        background: rgba(160, 174, 192, 0.15);
+        color: #a0aec0;
+        border: 1px solid rgba(160, 174, 192, 0.3);
+    }
+    .badge-rate {
+        background: rgba(237, 137, 54, 0.15);
+        color: #ed8936;
+        border: 1px solid rgba(237, 137, 54, 0.3);
+    }
+    .badge-general {
         background: rgba(72, 187, 120, 0.15);
         color: #48bb78;
         border: 1px solid rgba(72, 187, 120, 0.3);
     }
-    .badge-hybrid {
-        background: rgba(237, 137, 54, 0.15);
-        color: #ed8936;
-        border: 1px solid rgba(237, 137, 54, 0.3);
+    .badge-oos {
+        background: rgba(252, 129, 129, 0.15);
+        color: #fc8181;
+        border: 1px solid rgba(252, 129, 129, 0.3);
     }
 
     /* Sidebar styling */
@@ -162,17 +175,55 @@ st.markdown("""
         border-color: rgba(102, 126, 234, 0.5);
         color: #e2e8f0;
     }
-
-    /* Toggle container */
-    .toggle-container {
-        background: rgba(255, 255, 255, 0.03);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 8px;
-        padding: 10px 14px;
-        margin: 8px 0;
-    }
 </style>
 """, unsafe_allow_html=True)
+
+
+# ──────────────────────────────────────────────
+# Badge rendering helper
+# ──────────────────────────────────────────────
+BADGE_CONFIG = {
+    "rag": ("📄 From Indexed Documents", "badge-rag"),
+    "meta": ("📋 About This Assistant", "badge-meta"),
+    "live_rate": ("📡 Live RBI Data", "badge-rate"),
+    "general": ("🧠 General Banking Knowledge", "badge-general"),
+    "out_of_scope": ("⚠️ Out of Scope", "badge-oos"),
+}
+
+
+def render_badge(source_type: str):
+    """Render a source type badge."""
+    label, css_class = BADGE_CONFIG.get(source_type, ("📄 Response", "badge-rag"))
+    st.markdown(f'<span class="source-badge {css_class}">{label}</span>', unsafe_allow_html=True)
+
+
+def render_sources(sources: list):
+    """Render source cards in an expander."""
+    if not sources:
+        return
+
+    with st.expander("📄 Sources", expanded=False):
+        for src in sources:
+            src_type = src.get("type", "indexed")
+            is_live = src_type == "live_rate"
+            card_class = "source-card rate-source" if is_live else "source-card"
+            icon = "📡" if is_live else "📄"
+
+            url_line = ""
+            if is_live and src.get("url"):
+                url_line = f'<a href="{src["url"]}" target="_blank" style="color:#ed8936;font-size:0.8rem;">🔗 View on RBI website</a><br>'
+
+            page_label = "Data Date" if is_live else "Page"
+
+            st.markdown(
+                f'<div class="{card_class}">'
+                f'<span class="doc-name">{icon} {src["document"]}</span><br>'
+                f'<span class="page-num">{page_label}: {src["page"]}</span><br>'
+                f'{url_line}'
+                f'<small>{src["content_preview"]}</small>'
+                f'</div>',
+                unsafe_allow_html=True,
+            )
 
 
 # ──────────────────────────────────────────────
@@ -191,7 +242,7 @@ with st.sidebar:
 
     st.markdown("---")
 
-    # Descriptive note (replaces the circular list)
+    # Descriptive note
     st.markdown("""
     <div class="sidebar-note">
         <strong>What does this assistant do?</strong><br><br>
@@ -199,21 +250,12 @@ with st.sidebar:
         This assistant is powered by <strong>20+ indexed RBI Master Directions</strong>
         covering IRAC norms, credit facilities, PSL, MSME lending, KYC, digital lending,
         capital adequacy, and more.<br><br>
-        🔒 All answers are <strong>grounded in official RBI documents</strong> with source citations.
-        No hallucinations — if the answer isn't in the data, it will tell you.<br><br>
-        🌐 Enable <strong>Web Search</strong> below to also search rbi.org.in for the latest updates.
+        📡 Fetches <strong>live RBI key rates</strong> (Repo Rate, CRR, SLR, etc.) directly from rbi.org.in<br><br>
+        🧠 Answers <strong>general banking questions</strong> using AI knowledge<br><br>
+        🔒 All answers from indexed documents are <strong>grounded with source citations</strong>.
+        No hallucinations — if the answer isn't in the data, it will tell you.
     </div>
     """, unsafe_allow_html=True)
-
-    st.markdown("---")
-
-    # Web search toggle
-    st.markdown("**⚙️ Settings**")
-    enable_web_search = st.toggle(
-        "🌐 Enable RBI Web Search",
-        value=False,
-        help="When enabled, the assistant will also search rbi.org.in for the latest circulars and updates if the indexed documents don't fully cover your question."
-    )
 
     st.markdown("---")
 
@@ -256,18 +298,18 @@ with st.sidebar:
         - 📊 Embeddings: all-MiniLM-L6-v2
         - 🗃️ Vector Store: FAISS
         - 🔗 Framework: LangChain
-        - 🌐 Web Search: DuckDuckGo (rbi.org.in)
+        - 📡 Live Rates: Direct RBI scraping
         - 🎨 UI: Streamlit
 
-        **Anti-Hallucination:**
-        The assistant answers ONLY from the indexed RBI circulars
-        and cites sources for every response.
+        **Smart Routing:**
+        - 📄 RAG answers from 20+ indexed documents
+        - 📡 Live rate data from rbi.org.in
+        - 🧠 General banking knowledge
+        - 📋 Self-aware — can describe its own features
 
-        **Features:**
-        - 📄 20+ indexed RBI Master Directions
-        - 🌐 Optional web search restricted to rbi.org.in
-        - 🔄 Incremental knowledge base updates
-        - 📑 Source citations with page numbers
+        **Anti-Hallucination:**
+        The assistant answers ONLY from indexed RBI circulars
+        for regulation queries and cites sources for every response.
         """)
 
 
@@ -276,7 +318,7 @@ with st.sidebar:
 # ──────────────────────────────────────────────
 st.markdown('<div class="main-header">🏦 RBI Regulatory Assistant</div>', unsafe_allow_html=True)
 st.markdown(
-    '<div class="sub-header">Ask questions about RBI Master Directions on Credit Regulations</div>',
+    '<div class="sub-header">Ask questions about RBI regulations, credit policies, or current key rates</div>',
     unsafe_allow_html=True,
 )
 
@@ -315,11 +357,11 @@ else:
 # ──────────────────────────────────────────────
 EXAMPLE_QUESTIONS = [
     "What are the IRAC norms for asset classification?",
+    "What is the current repo rate?",
     "What are the Priority Sector Lending targets for banks?",
     "Explain the KYC requirements for opening a bank account",
     "What is the LTV ratio for housing loans?",
-    "What are the guidelines for digital lending?",
-    "How are wilful defaulters classified by RBI?",
+    "What can you do?",
 ]
 
 if not st.session_state.messages:
@@ -339,43 +381,19 @@ for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         # Show source type badge for assistant messages
         if message["role"] == "assistant" and "source_type" in message:
-            source_type = message["source_type"]
-            if source_type == "rag":
-                st.markdown('<span class="source-badge badge-rag">📄 From Indexed Documents</span>', unsafe_allow_html=True)
-            elif source_type == "web":
-                st.markdown('<span class="source-badge badge-web">🌐 From RBI Website</span>', unsafe_allow_html=True)
-            elif source_type == "hybrid":
-                st.markdown('<span class="source-badge badge-hybrid">📄🌐 Indexed + Web Results</span>', unsafe_allow_html=True)
+            render_badge(message["source_type"])
 
         st.markdown(message["content"])
 
         # Show sources for assistant messages
         if message["role"] == "assistant" and "sources" in message:
-            with st.expander("📄 Sources", expanded=False):
-                for src in message["sources"]:
-                    is_web = src.get("type") == "web"
-                    card_class = "source-card web-source" if is_web else "source-card"
-                    icon = "🌐" if is_web else "📄"
-
-                    url_line = ""
-                    if is_web and src.get("url"):
-                        url_line = f'<a href="{src["url"]}" target="_blank" style="color:#48bb78;font-size:0.8rem;">🔗 Open on RBI website</a><br>'
-
-                    st.markdown(
-                        f'<div class="{card_class}">'
-                        f'<span class="doc-name">{icon} {src["document"]}</span><br>'
-                        f'<span class="page-num">{"URL" if is_web else "Page"} {src["page"]}</span><br>'
-                        f'{url_line}'
-                        f'<small>{src["content_preview"]}</small>'
-                        f'</div>',
-                        unsafe_allow_html=True,
-                    )
+            render_sources(message["sources"])
 
 
 # ──────────────────────────────────────────────
 # Chat input
 # ──────────────────────────────────────────────
-if prompt := st.chat_input("Ask about RBI credit regulations..."):
+if prompt := st.chat_input("Ask about RBI regulations, credit policies, or current rates..."):
     # Append user message
     st.session_state.messages.append({"role": "user", "content": prompt})
     st.rerun()
@@ -383,56 +401,32 @@ if prompt := st.chat_input("Ask about RBI credit regulations..."):
 # Generate response if the last message is from the user
 if st.session_state.messages and st.session_state.messages[-1]["role"] == "user":
     prompt = st.session_state.messages[-1]["content"]
-    
+
     with st.chat_message("assistant"):
-        search_label = "🔍 Searching RBI circulars & web..." if enable_web_search else "🔍 Searching RBI circulars..."
-        with st.spinner(search_label):
+        with st.spinner("🔍 Thinking..."):
             try:
                 result = query_with_sources(
                     question=prompt,
                     rag_chain=st.session_state.rag_chain,
                     retriever=st.session_state.retriever,
-                    enable_web_search=enable_web_search,
+                    chat_history=st.session_state.messages[:-1]  # Exclude the current prompt
                 )
 
                 # Show source type badge
                 source_type = result.get("source_type", "rag")
-                if source_type == "rag":
-                    st.markdown('<span class="source-badge badge-rag">📄 From Indexed Documents</span>', unsafe_allow_html=True)
-                elif source_type == "web":
-                    st.markdown('<span class="source-badge badge-web">🌐 From RBI Website</span>', unsafe_allow_html=True)
-                elif source_type == "hybrid":
-                    st.markdown('<span class="source-badge badge-hybrid">📄🌐 Indexed + Web Results</span>', unsafe_allow_html=True)
+                render_badge(source_type)
 
                 # Display answer
                 st.markdown(result["answer"])
 
                 # Display sources
-                with st.expander("📄 Sources", expanded=False):
-                    for src in result["sources"]:
-                        is_web = src.get("type") == "web"
-                        card_class = "source-card web-source" if is_web else "source-card"
-                        icon = "🌐" if is_web else "📄"
-
-                        url_line = ""
-                        if is_web and src.get("url"):
-                            url_line = f'<a href="{src["url"]}" target="_blank" style="color:#48bb78;font-size:0.8rem;">🔗 Open on RBI website</a><br>'
-
-                        st.markdown(
-                            f'<div class="{card_class}">'
-                            f'<span class="doc-name">{icon} {src["document"]}</span><br>'
-                            f'<span class="page-num">{"URL" if is_web else "Page"} {src["page"]}</span><br>'
-                            f'{url_line}'
-                            f'<small>{src["content_preview"]}</small>'
-                            f'</div>',
-                            unsafe_allow_html=True,
-                        )
+                render_sources(result.get("sources", []))
 
                 # Save to session state
                 st.session_state.messages.append({
                     "role": "assistant",
                     "content": result["answer"],
-                    "sources": result["sources"],
+                    "sources": result.get("sources", []),
                     "source_type": source_type,
                 })
 
@@ -443,4 +437,3 @@ if st.session_state.messages and st.session_state.messages[-1]["role"] == "user"
                     "role": "assistant",
                     "content": error_msg,
                 })
-

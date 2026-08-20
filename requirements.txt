@@ -7,5 +7,6 @@ faiss-cpu
 streamlit
 pypdf
 python-dotenv
-duckduckgo-search
 requests
+beautifulsoup4
+lxml
